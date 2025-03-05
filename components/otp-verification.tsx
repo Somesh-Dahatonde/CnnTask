@@ -70,6 +70,7 @@ export function OTPVerification({
       // Success - move to next step
       onSuccess();
     } catch (error) {
+      console.error("OTP verification failed:", error);
       toast({
         title: "Verification Failed",
         description: "Invalid OTP. Please try again.",
@@ -87,7 +88,7 @@ export function OTPVerification({
           Verify Your {type === "email" ? "Email" : "Mobile"}
         </h3>
         <p className="text-sm text-muted-foreground">
-          We've sent a 6-digit code to{" "}
+          We've sent a 6-digit code to
           {type === "email" ? contactValue : `+91 ${contactValue}`}
         </p>
       </div>

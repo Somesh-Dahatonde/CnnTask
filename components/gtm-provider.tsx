@@ -2,6 +2,12 @@
 
 import type React from "react";
 
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
 import { useEffect } from "react";
 import Script from "next/script";
 

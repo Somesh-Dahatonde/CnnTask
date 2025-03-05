@@ -15,9 +15,16 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
+interface PaymentData {
+  transactionId: string;
+  amount: number;
+  timestamp: string;
+  status: string;
+}
+
 interface PaymentFormProps {
   amount: number;
-  onSuccess: (data: any) => void;
+  onSuccess: (data: PaymentData) => void;
   onCancel: () => void;
 }
 
@@ -53,6 +60,7 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
 
       onSuccess(paymentData);
     } catch (error) {
+      console.error("Payment failed:", error);
       toast({
         title: "Payment Failed",
         description:

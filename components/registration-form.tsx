@@ -127,7 +127,6 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
           <div className="flex flex-col items-center gap-4">
             {photoPreview ? (
               <div className="relative w-32 h-32 rounded-full overflow-hidden border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photoPreview || "/placeholder.svg"}
                   alt="Profile preview"

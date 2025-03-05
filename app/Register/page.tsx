@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 // import { Textarea } from "@/components/ui/textarea"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Camera } from "lucide-react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -31,11 +31,9 @@ import * as z from "zod";
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  mobile: z
-    .string()
-    .regex(/^[6-9]\d{9}$/, {
-      message: "Please enter a valid 10-digit mobile number.",
-    }),
+  mobile: z.string().regex(/^[6-9]\d{9}$/, {
+    message: "Please enter a valid 10-digit mobile number.",
+  }),
   location: z
     .string()
     .min(2, { message: "Location must be at least 2 characters." }),
@@ -46,9 +44,9 @@ const formSchema = z.object({
 
 export default function RegistrationForm() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<FormData>({} as FormData);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const router = useRouter();
+  // const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,17 +77,17 @@ export default function RegistrationForm() {
     setStep(2); // Move to OTP verification
   };
 
-  const handleOtpVerified = () => {
-    setStep(3); // Move to payment
-  };
+  // const handleOtpVerified = () => {
+  //   setStep(3); // Move to payment
+  // };
 
-  const handlePaymentComplete = () => {
-    setStep(4); // Move to Aadhar verification
-  };
+  // const handlePaymentComplete = () => {
+  //   setStep(4); // Move to Aadhar verification
+  // };
 
-  const handleAadharVerified = () => {
-    setStep(5); // Move to success page
-  };
+  // const handleAadharVerified = () => {
+  //   setStep(5); // Move to success page
+  // };
 
   return (
     <div>

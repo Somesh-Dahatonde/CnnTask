@@ -58,6 +58,7 @@ export function AadharVerificationForm({
 
       onSuccess(verificationData);
     } catch (error) {
+      console.error("Aadhar verification failed:", error);
       toast({
         title: "Verification Failed",
         description:
