@@ -96,6 +96,8 @@ export function AadharVerificationForm({
                 <Input
                   placeholder="XXXX XXXX XXXX"
                   {...field}
+                  type="number"
+                  className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   onChange={(e) => {
                     const rawValue = e.target.value.replace(/\s/g, "");
                     const formattedValue = formatAadharNumber(rawValue);
@@ -125,7 +127,7 @@ export function AadharVerificationForm({
           </Button>
           <Button
             type="submit"
-            className="flex-1"
+            className="rounded-lg  bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 flex-1"
             disabled={loading || !form.formState.isValid}
           >
             {loading ? (

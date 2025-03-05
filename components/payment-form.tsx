@@ -142,6 +142,7 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
           <Checkbox
             id="terms"
             checked={termsAccepted}
+            className=" h-4 w-4 border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-primary-foreground"
             onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
           />
           <Label
@@ -161,7 +162,11 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
         >
           Back
         </Button>
-        <Button className="flex-1" onClick={handlePayment} disabled={loading}>
+        <Button
+          className="rounded-lg  bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 flex-1"
+          onClick={handlePayment}
+          disabled={loading}
+        >
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

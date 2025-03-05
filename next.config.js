@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "g-mxtlc2zquep.vusercontent.net",
       },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
     ],
   },
 };

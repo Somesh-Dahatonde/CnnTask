@@ -134,7 +134,7 @@ export function OTPVerification({
           </Button>
           <Button
             type="button"
-            className="flex-1"
+            className="rounded-lg  bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 flex-1"
             onClick={handleVerify}
             disabled={loading || otp.length !== 6}
           >

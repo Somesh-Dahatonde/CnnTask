@@ -94,7 +94,10 @@ export function RegistrationSuccess({
         </div>
       </div>
 
-      <Button onClick={onClose} className="w-full">
+      <Button
+        onClick={onClose}
+        className="rounded-lg  bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 w-full"
+      >
         Close
       </Button>
     </div>
