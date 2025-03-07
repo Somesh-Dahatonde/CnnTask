@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { RegistrationModal } from "@/components/registration-modal";
-import FeatureCourse from "./featurecourse";
-import { Toast } from "./ui/toast";
+// import FeatureCourse from "./featurecourse";
+// import { Toast } from "./ui/toast";
 // import Group from "../app/images/Group.png";
 
 export function LandingHero() {

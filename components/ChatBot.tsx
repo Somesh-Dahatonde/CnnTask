@@ -32,6 +32,7 @@ function ChatBot() {
         { sender: "bot", text: response.data.reply },
       ]);
     } catch (error) {
+      console.error("Failed to fetch AI response:", error);
       setMessages([
         ...newMessages,
         { sender: "bot", text: "Sorry, something went wrong!" },

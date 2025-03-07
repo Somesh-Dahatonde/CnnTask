@@ -1,5 +1,4 @@
 import {
-  ChevronDown,
   ChevronRight,
   Facebook,
   Instagram,
