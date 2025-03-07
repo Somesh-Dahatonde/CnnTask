@@ -44,7 +44,7 @@ export function Testimonials() {
   ];
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
+    <section className="w-full py-12 md:py-24 lg:py-32 ">
       <motion.div
         className="container px-4 md:px-6 text-center"
         initial={{ opacity: 0, y: 50 }}
@@ -81,7 +81,7 @@ export function Testimonials() {
                         alt={testimonial.name}
                         width={80}
                         height={80}
-                        className="rounded-full object-cover"
+                        className="rounded-full object-cover border-green-500 border-2"
                       />
                       <p className="text-sm italic text-muted-foreground mt-4">
                         "{testimonial.testimonial}"

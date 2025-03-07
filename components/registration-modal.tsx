@@ -63,10 +63,11 @@ export function RegistrationModal({ children }: { children: React.ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle>{titles[step]}</DialogTitle>
           <DialogDescription>{descriptions[step]}</DialogDescription>
+          <hr />
         </DialogHeader>
 
         {step === "register" && (

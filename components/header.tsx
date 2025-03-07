@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RegistrationModal } from "@/components/registration-modal";
 import { useState } from "react";
 import { AlignJustify, X } from "lucide-react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
@@ -50,9 +51,10 @@ export function Header() {
   // bg-background/80 backdrop-blur-md
   return (
     <header className="w-full py-4 fixed top-0 z-50 bg-white">
-      <div className="container flex h-10 items-center px-4 md:px-6">
-        <Link href="/" className="flex items-center justify-center  p-6">
-          <span className="font-bold text-xl">CCN</span>
+      <div className="container flex h-10 items-center px-4 md:px-6 justify-evenly gap-4">
+        <Link href="/" className="flex items-center justify-center">
+          {/* <span className="font-bold text-xl">CCN</span> */}
+          <Image src="/images/logo.png" alt="logo" width={250} height={40} />
         </Link>
 
         {/* Desktop Navigation */}

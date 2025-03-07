@@ -8,11 +8,12 @@ import { RegistrationModal } from "@/components/registration-modal";
 import { GTMProvider } from "@/components/gtm-provider";
 import Image from "next/image";
 import "./output.css";
+import ChatBot from "@/components/ChatBot";
 
 export default function LandingPage() {
   return (
     <GTMProvider gtmId={process.env.NEXT_PUBLIC_GTM_ID || ""}>
-      <main className="flex min-h-screen flex-col">
+      <main className="flex min-h-screen flex-col relative">
         <LandingHero />
         <Features />
         <section className="w-full py-12 md:py-24 lg:py-32 bg-background-gradient">
@@ -46,6 +47,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        <ChatBot />
         <Testimonials />
         <FAQ />
         <Footer />

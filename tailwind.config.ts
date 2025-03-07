@@ -15,6 +15,12 @@ const config: Config = {
           "linear-gradient(180deg, #D9ECFF 0%, rgba(240, 243, 255, 0.00) 127.78%)",
       },
       colors: {
+        warning: {
+          DEFAULT: "#f59e0b", // Base warning color (amber-500)
+          border: "#d97706", // Darker amber (amber-600) for borders
+          bg: "#fef3c7", // Light amber (amber-200) for backgrounds
+          "text-foreground": "#78350f", // Deep amber (amber-800) for text contrast
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

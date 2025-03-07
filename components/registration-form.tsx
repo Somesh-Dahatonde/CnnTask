@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { OTPVerification } from "@/components/otp-verification";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -31,6 +33,7 @@ const formSchema = z.object({
     message: "Please enter a valid 10-digit mobile number.",
   }),
   photo: z.any().optional(),
+  countryCode: z.string().optional(),
 });
 
 interface RegistrationFormProps {
@@ -38,9 +41,11 @@ interface RegistrationFormProps {
 }
 
 export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
+  const { toast } = useToast();
   const [step, setStep] = useState<"form" | "emailOTP" | "mobileOTP">("form");
   const [formValues, setFormValues] = useState<any>({});
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const countryCodes = ["+91", "+1", "+44", "+61", "+81"];
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,6 +55,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
       location: "",
       email: "",
       mobile: "",
+      countryCode: "+91",
       photo: undefined,
     },
   });
@@ -77,9 +83,107 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     }
   };
 
-  const handleFormSubmit = (data: z.infer<typeof formSchema>) => {
-    setFormValues(data);
-    setStep("emailOTP");
+  const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
+    // Check if all fields are filled
+    if (!data.name || !data.location || !data.email || !data.mobile) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Please fill all the fields!",
+      });
+      return;
+    }
+
+    // Check if a photo is uploaded
+    if (!data.photo) {
+      toast({
+        variant: "destructive",
+        title: "Photo Required",
+        description: "Please upload a photo!",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("location", data.location);
+    formData.append("email", data.email);
+    formData.append("mobile", `${data.countryCode}${data.mobile}`);
+    formData.append("photo", data.photo);
+
+    console.log("Submitting formData:", formData);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/students/register",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      console.log("Response:", response.data);
+
+      // Handle User Already Exists case
+      if (response.data.message?.includes("User already exists")) {
+        toast({
+          variant: "warning",
+          title: "User Exists",
+          description:
+            "A user with this email or mobile number already exists!",
+        });
+      }
+
+      // If user registration is successful, check verification state
+      if (response.data.user) {
+        let state: "form" | "emailOTP" | "mobileOTP";
+        if (!response.data.user.isMobileVerified) {
+          state = "mobileOTP";
+          toast({
+            variant: "warning",
+            title: "Mobile Verification Required",
+            description:
+              "OTP has been sent to your mobile number for verification.",
+          });
+        } else if (!response.data.user.isEmailVerified) {
+          state = "emailOTP";
+          toast({
+            variant: "warning",
+            title: "Email Verification Required",
+            description:
+              "OTP has been sent to your email address for verification.",
+          });
+        } else {
+          onSubmit({
+            ...data,
+            photo: photoPreview,
+          });
+
+          return;
+        }
+
+        setFormValues(data);
+        setStep(state);
+      } else {
+        setFormValues(data);
+        setStep("emailOTP");
+        toast({
+          title: "Registration Successful",
+          description: "Please verify your email to complete registration.",
+        });
+      }
+    } catch (err) {
+      console.error("Error:", err);
+
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description:
+          axios.isAxiosError(err) && err.response?.data?.message
+            ? err.response.data.message
+            : "Something went wrong!",
+      });
+    }
   };
 
   const handleEmailOTPSuccess = () => {
@@ -108,7 +212,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     return (
       <OTPVerification
         type="mobile"
-        contactValue={formValues.mobile}
+        contactValue={formValues.countryCode + formValues.mobile}
         onSuccess={handleMobileOTPSuccess}
         onCancel={() => setStep("emailOTP")}
       />
@@ -123,7 +227,6 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
       >
         {/* Photo Upload */}
         <div className="space-y-2">
-          <FormLabel>Photo</FormLabel>
           <div className="flex flex-col items-center gap-4">
             {photoPreview ? (
               <div className="relative w-32 h-32 rounded-full overflow-hidden border">
@@ -137,48 +240,60 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                   variant="outline"
                   size="sm"
                   className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-                  onClick={() => setPhotoPreview(null)}
+                  onClick={() => {
+                    setPhotoPreview(null);
+                    form.setValue("photo", undefined);
+                  }}
                 >
                   Change
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePhotoCapture}
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  Take Photo
-                </Button>
-                <div>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    id="photo-upload"
-                    className="hidden"
-                    capture="user" // Enables camera capture
-                    onChange={handlePhotoUpload}
+              <div className="flex gap-4 flex-col justify-center items-center">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden border">
+                  <img
+                    src={photoPreview || "/images/logo.png"}
+                    className="w-full h-full object-cover "
                   />
-
+                </div>
+                <div className="flex flex-row gap-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      document.getElementById("photo-upload")?.click()
-                    }
+                    onClick={handlePhotoCapture}
                   >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload Photo
+                    <Camera className="mr-2 h-4 w-4" />
+                    Take Photo
                   </Button>
+                  <div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      id="photo-upload"
+                      className="hidden"
+                      capture="user" // Enables camera capture
+                      onChange={handlePhotoUpload}
+                    />
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        document.getElementById("photo-upload")?.click()
+                      }
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Photo
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
+            <FormLabel>Profile Photo</FormLabel>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
           <FormField
             control={form.control}
             name="name"
@@ -225,19 +340,34 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
               </FormItem>
             )}
           />
+
+          {/* Mobile Number Input */}
           <FormField
             control={form.control}
             name="mobile"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex-grow">
                 <FormLabel>Mobile Number</FormLabel>
-                <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    {...field}
-                  />
-                </FormControl>
+                <div className="relative flex justify-center gap-1">
+                  <select
+                    {...form.register("countryCode")}
+                    className="block appearance-none bg-white border  hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline h-9"
+                  >
+                    {countryCodes.map((code) => (
+                      <option key={code} value={code}>
+                        {code}
+                      </option>
+                    ))}
+                  </select>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="10-digit mobile number"
+                      {...field}
+                      className="w-full"
+                    />
+                  </FormControl>
+                </div>
                 <FormDescription>
                   We'll send you an OTP to verify this number.
                 </FormDescription>

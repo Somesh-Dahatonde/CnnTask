@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import axios from "axios";
 
 interface OTPVerificationProps {
   type: "email" | "mobile";
@@ -25,6 +26,8 @@ export function OTPVerification({
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [resendDisabled, setResendDisabled] = useState<boolean>(true);
 
+  const otpType = type === "email" ? "/verify-email" : "/verify-number";
+
   // Handle countdown timer for OTP resend
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -43,6 +46,43 @@ export function OTPVerification({
     setResendDisabled(true);
     setTimeLeft(60);
 
+    const data =
+      otpType === "/verify-email"
+        ? { email: contactValue }
+        : { phoneNumber: contactValue };
+
+    const apiUrl =
+      otpType === "/verify-email"
+        ? `http://localhost:3000/auth/resend-email`
+        : `http://localhost:3000/auth/resend-sms`;
+
+    try {
+      axios
+        .post(apiUrl, data)
+        .then((response) => {
+          console.log("OTP resend successful:", response.data);
+          toast({
+            title: `OTP Resent`,
+            description: `A new OTP has been sent to your ${type}.`,
+          });
+        })
+        .catch((error) => {
+          console.error("OTP resend failed:", error);
+          toast({
+            title: "Resend Failed",
+            description: "Failed to resend OTP. Please try again.",
+            variant: "destructive",
+          });
+        });
+    } catch (error) {
+      console.error("OTP resend failed:", error);
+      toast({
+        title: "Resend Failed",
+        description: "Failed to resend OTP. Please try again.",
+        variant: "destructive",
+      });
+    }
+
     // Simulating API call to resend OTP
     toast({
       title: `OTP Resent`,
@@ -59,16 +99,38 @@ export function OTPVerification({
       });
       return;
     }
-
     setLoading(true);
+    const data =
+      otpType === "/verify-email"
+        ? {
+            otp: otp,
+            email: contactValue,
+          }
+        : {
+            otp: otp,
+            phoneNumber: contactValue,
+          };
 
     try {
-      // In a real implementation, make an API call to verify OTP
-      // Simulating API delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Success - move to next step
-      onSuccess();
+      axios
+        .post(`http://localhost:3000/auth${otpType}`, data)
+        .then((response) => {
+          console.log("OTP verification successful:", response.data);
+          toast({
+            title: "OTP Verified",
+            description: `Your ${type} has been successfully verified.`,
+          });
+          setOtp("");
+          onSuccess();
+        })
+        .catch((error) => {
+          console.error("OTP verification failed:", error);
+          toast({
+            title: "Verification Failed",
+            description: "Invalid OTP. Please try again.",
+            variant: "destructive",
+          });
+        });
     } catch (error) {
       console.error("OTP verification failed:", error);
       toast({
@@ -88,7 +150,7 @@ export function OTPVerification({
           Verify Your {type === "email" ? "Email" : "Mobile"}
         </h3>
         <p className="text-sm text-muted-foreground">
-          We've sent a 6-digit code to
+          We've sent a 6-digit code to{" "}
           {type === "email" ? contactValue : `+91 ${contactValue}`}
         </p>
       </div>

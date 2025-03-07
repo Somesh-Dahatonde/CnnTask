@@ -31,6 +31,7 @@ Task Details:
 - After the landing page is completed, we will review the full code to ensure that:
 - No code is copied from external sources.
 - No free third-party APIs are used.
+
 - These are basic tasks that every developer should be able to complete.
 - Kindly complete the landing page as soon as possible and make it live. Once we review your work, we will proceed with sending your offer letter.
 
