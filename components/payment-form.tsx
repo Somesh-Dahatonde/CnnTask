@@ -6,32 +6,34 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
+  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-
-interface PaymentData {
-  transactionId: string;
-  amount: number;
-  timestamp: string;
-  status: string;
-}
+import api from "@/utils/api";
 
 interface PaymentFormProps {
   amount: number;
-  onSuccess: (data: PaymentData) => void;
+  studentId: string;
+  phoneNumber: string;
   onCancel: () => void;
 }
 
-export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
+export function PaymentForm({
+  amount,
+  studentId,
+  phoneNumber,
+  onCancel,
+}: PaymentFormProps) {
+  const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
+  console.log(amount, studentId, phoneNumber, "payment form");
   const handlePayment = async () => {
     if (!termsAccepted) {
       toast({
@@ -45,20 +47,20 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
     setLoading(true);
 
     try {
-      // In a real implementation, integrate with PhonePe API
-      // This is a placeholder for the payment gateway integration
-      // Simulating payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await api.post("/payments/request", {
+        amount,
+        studentId,
+        phoneNumber,
+      });
 
-      // Mock successful payment
-      const paymentData = {
-        transactionId: `TXN${Math.floor(Math.random() * 1000000)}`,
-        amount: amount,
-        timestamp: new Date().toISOString(),
-        status: "SUCCESS",
-      };
+      const paymentData = response.data;
 
-      onSuccess(paymentData);
+      if (paymentData.code === "PAYMENT_INITIATED") {
+        window.location.href =
+          paymentData.data.instrumentResponse.redirectInfo.url;
+      } else {
+        throw new Error("Payment initiation failed");
+      }
     } catch (error) {
       console.error("Payment failed:", error);
       toast({
@@ -79,86 +81,38 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
         <CardDescription>Secure your seat in the demo batch</CardDescription>
       </CardHeader>
       <CardContent className="p-0 pb-4 space-y-6">
-        <div className="rounded-lg border p-4">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm">Registration Fee</span>
-              <span className="font-medium">₹{amount}.00</span>
-            </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span className="text-sm">GST (Included)</span>
-              <span className="text-sm">₹{(amount * 0.18).toFixed(2)}</span>
-            </div>
-            <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
-              <span>Total</span>
-              <span>₹{amount}.00</span>
+        <div className="rounded-lg bg-muted p-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Registration Fee
+              </h3>
+              <p className="text-2xl font-bold">₹{amount}.00</p>
+              <p className="text-xs text-muted-foreground">
+                This is a one-time fee to confirm your demo batch seat
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border p-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Payment Methods</p>
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <div className="flex items-center gap-2">
-                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-50">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z"
-                      fill="#3E2D86"
-                    />
-                    <path
-                      d="M12 8L16 10.25V14.75L12 17L8 14.75V10.25L12 8Z"
-                      fill="white"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-medium">PhonePe</p>
-                  <p className="text-xs text-muted-foreground">
-                    UPI, Cards, Netbanking
-                  </p>
-                </div>
-              </div>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="10" cy="10" r="10" fill="#3E2D86" />
-                <path
-                  d="M6 10L9 13L14 7"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
+        <div className="flex items-center space-x-2">
           <Checkbox
             id="terms"
             checked={termsAccepted}
-            className=" h-4 w-4 border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-primary-foreground"
-            onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+            onCheckedChange={(checked) => setTermsAccepted(checked! as boolean)}
           />
-          <Label
-            htmlFor="terms"
-            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            I agree to the terms and conditions, including the refund policy.
-          </Label>
+          <div className="grid gap-1.5 leading-none">
+            <Label htmlFor="terms">
+              I agree to the{" "}
+              <a href="#" className="underline underline-offset-2">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="underline underline-offset-2">
+                Privacy Policy
+              </a>
+            </Label>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="p-0 flex gap-2">
@@ -171,7 +125,7 @@ export function PaymentForm({ amount, onSuccess, onCancel }: PaymentFormProps) {
           Back
         </Button>
         <Button
-          className="rounded-lg  bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 flex-1"
+          className="rounded-lg bg-transparent border-2 border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 flex-1"
           onClick={handlePayment}
           disabled={loading}
         >

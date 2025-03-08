@@ -13,29 +13,23 @@ import {
 import { RegistrationForm } from "@/components/registration-form";
 import { PaymentForm } from "@/components/payment-form";
 import { AadharVerificationForm } from "@/components/aadhar-verification-form";
-import { RegistrationSuccess } from "@/components/registration-success";
 
 export function RegistrationModal({ children }: { children: React.ReactNode }) {
   const [step, setStep] = useState<
-    "register" | "payment" | "verification" | "success"
+    "register" | "payment" | "addharVerification"
   >("register");
   const [formData, setFormData] = useState<any>({});
   const [open, setOpen] = useState(false);
 
+  console.log(formData, "formData");
+
   const handleFormSubmit = (data: any) => {
     setFormData({ ...formData, ...data });
+    console.log(data, "data from form submit");
     setStep("payment");
   };
 
-  const handlePaymentSuccess = (data: any) => {
-    setFormData({ ...formData, payment: data });
-    setStep("verification");
-  };
-
-  const handleVerificationSuccess = (data: any) => {
-    setFormData({ ...formData, verification: data });
-    setStep("success");
-  };
+  console.log(formData, "formData");
 
   const handleClose = () => {
     setOpen(false);
@@ -46,27 +40,25 @@ export function RegistrationModal({ children }: { children: React.ReactNode }) {
     }, 300);
   };
 
-  const titles = {
-    register: "Register for Demo Batch",
-    payment: "Complete Payment",
-    verification: "Verify Aadhar",
-    success: "Registration Successful",
-  };
-
-  const descriptions = {
-    register: "Fill in your details to register for our demo batch.",
-    payment: "Complete the payment process to secure your seat.",
-    verification: "Verify your identity to complete the registration.",
-    success: "Your registration has been successfully completed.",
-  };
+  function handleVerificationSuccess(data: any): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
-          <DialogTitle>{titles[step]}</DialogTitle>
-          <DialogDescription>{descriptions[step]}</DialogDescription>
+          <DialogTitle>
+            {step === "register"
+              ? "Register for Demo Batch"
+              : "Complete Payment"}
+          </DialogTitle>
+          <DialogDescription>
+            {step === "register"
+              ? "Fill in your details to register for our demo batch."
+              : "Complete the payment process to secure your seat."}
+          </DialogDescription>
           <hr />
         </DialogHeader>
 
@@ -76,18 +68,18 @@ export function RegistrationModal({ children }: { children: React.ReactNode }) {
         {step === "payment" && (
           <PaymentForm
             amount={100}
-            onSuccess={handlePaymentSuccess}
+            studentId={formData.user.id}
+            phoneNumber={formData.user.mobile}
             onCancel={() => setStep("register")}
           />
         )}
-        {step === "verification" && (
+
+        {step === "addharVerification" && (
           <AadharVerificationForm
+            addharNumber={formData.user.addharNumber}
             onSuccess={handleVerificationSuccess}
             onCancel={() => setStep("payment")}
           />
-        )}
-        {step === "success" && (
-          <RegistrationSuccess data={formData} onClose={handleClose} />
         )}
       </DialogContent>
     </Dialog>

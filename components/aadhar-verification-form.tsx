@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { AadharVerificationFormProps } from "@/types";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -27,9 +26,14 @@ const formSchema = z.object({
 });
 
 export function AadharVerificationForm({
+  addharNumber,
   onSuccess,
   onCancel,
-}: AadharVerificationFormProps) {
+}: {
+  addharNumber: string;
+  onSuccess: (data: any) => void;
+  onCancel: () => void;
+}) {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Initialize form

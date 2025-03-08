@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { LandingHero } from "@/components/landing-hero";
 import { Features } from "@/components/features";
@@ -9,8 +11,16 @@ import { GTMProvider } from "@/components/gtm-provider";
 import Image from "next/image";
 import "./output.css";
 import ChatBot from "@/components/ChatBot";
+import api from "@/utils/api";
+import { useEffect } from "react";
 
 export default function LandingPage() {
+  useEffect(() => {
+    api.get("/health").then((res: any) => {
+      console.log(res.data);
+    });
+  }, []);
+
   return (
     <GTMProvider gtmId={process.env.NEXT_PUBLIC_GTM_ID || ""}>
       <main className="flex min-h-screen flex-col relative">

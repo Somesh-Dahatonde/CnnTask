@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import axios from "axios";
+import api from "@/utils/api";
 
 interface OTPVerificationProps {
   type: "email" | "mobile";
@@ -52,12 +52,10 @@ export function OTPVerification({
         : { phoneNumber: contactValue };
 
     const apiUrl =
-      otpType === "/verify-email"
-        ? `http://localhost:3000/auth/resend-email`
-        : `http://localhost:3000/auth/resend-sms`;
+      otpType === "/verify-email" ? `/auth/resend-email` : `/auth/resend-sms`;
 
     try {
-      axios
+      api
         .post(apiUrl, data)
         .then((response) => {
           console.log("OTP resend successful:", response.data);
@@ -112,8 +110,8 @@ export function OTPVerification({
           };
 
     try {
-      axios
-        .post(`http://localhost:3000/auth${otpType}`, data)
+      api
+        .post(`/auth${otpType}`, data)
         .then((response) => {
           console.log("OTP verification successful:", response.data);
           toast({

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { OTPVerification } from "@/components/otp-verification";
-import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import api from "@/utils/api";
+import axios from "axios";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -46,7 +47,10 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
   const [formValues, setFormValues] = useState<any>({});
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const countryCodes = ["+91", "+1", "+44", "+61", "+81"];
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+  const [isMobileVerified, setIsMobileVerified] = useState<boolean>(false);
 
+  const [user, setUser] = useState<any>(null);
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -114,16 +118,13 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     console.log("Submitting formData:", formData);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/students/register",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await api.post("/students/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       console.log("Response:", response.data);
 
+      setUser(response.data);
       // Handle User Already Exists case
       if (response.data.message?.includes("User already exists")) {
         toast({
@@ -138,6 +139,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
       if (response.data.user) {
         let state: "form" | "emailOTP" | "mobileOTP";
         if (!response.data.user.isMobileVerified) {
+          setIsMobileVerified(response.data.user.isMobileVerified);
           state = "mobileOTP";
           toast({
             variant: "warning",
@@ -146,6 +148,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
               "OTP has been sent to your mobile number for verification.",
           });
         } else if (!response.data.user.isEmailVerified) {
+          setIsEmailVerified(response.data.user.isEmailVerified);
           state = "emailOTP";
           toast({
             variant: "warning",
@@ -156,6 +159,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
         } else {
           onSubmit({
             ...data,
+            ...response.data,
             photo: photoPreview,
           });
 
@@ -187,13 +191,38 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
   };
 
   const handleEmailOTPSuccess = () => {
-    setStep("mobileOTP");
+    setIsEmailVerified(true);
+
+    setIsMobileVerified((prevMobileVerified) => {
+      if (!prevMobileVerified) {
+        setStep("mobileOTP");
+      } else {
+        // If mobile is already verified, proceed to submission
+        onSubmit({
+          ...formValues,
+          user: user.user,
+          photo: photoPreview,
+        });
+      }
+      return prevMobileVerified; // Keep the previous state
+    });
   };
 
   const handleMobileOTPSuccess = () => {
-    onSubmit({
-      ...formValues,
-      photo: photoPreview,
+    setIsMobileVerified(true);
+
+    setIsEmailVerified((prevEmailVerified) => {
+      if (!prevEmailVerified) {
+        setStep("emailOTP");
+      } else {
+        // If email is already verified, proceed to submission
+        onSubmit({
+          ...formValues,
+          user: user.user,
+          photo: photoPreview,
+        });
+      }
+      return prevEmailVerified; // Keep the previous state
     });
   };
 
