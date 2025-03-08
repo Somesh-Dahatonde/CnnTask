@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -49,6 +49,8 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
   const countryCodes = ["+91", "+1", "+44", "+61", "+81"];
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
   const [isMobileVerified, setIsMobileVerified] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [user, setUser] = useState<any>(null);
   // Initialize form
@@ -63,15 +65,6 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
       photo: undefined,
     },
   });
-
-  const handlePhotoCapture = () => {
-    // In a real implementation, you would integrate with device camera
-    // This is a placeholder for the camera functionality
-    alert("Camera functionality would be implemented here in production");
-    const randomPhoto = "https://picsum.photos/200";
-    setPhotoPreview(randomPhoto);
-    form.setValue("photo", "photo_data_here");
-  };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -282,40 +275,50 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
               <div className="flex gap-4 flex-col justify-center items-center">
                 <div className="relative w-32 h-32 rounded-full overflow-hidden border">
                   <img
-                    src={photoPreview || "/images/logo.png"}
-                    className="w-full h-full object-cover "
+                    src="/images/logo.png"
+                    alt="Default profile"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="flex flex-row gap-4">
+                  {/* Camera input for mobile devices */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="user"
+                    id="camera-input"
+                    ref={cameraInputRef}
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
+
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={handlePhotoCapture}
+                    onClick={() => cameraInputRef.current?.click()}
                   >
                     <Camera className="mr-2 h-4 w-4" />
                     Take Photo
                   </Button>
-                  <div>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      id="photo-upload"
-                      className="hidden"
-                      capture="user" // Enables camera capture
-                      onChange={handlePhotoUpload}
-                    />
 
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() =>
-                        document.getElementById("photo-upload")?.click()
-                      }
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Photo
-                    </Button>
-                  </div>
+                  {/* File upload input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="file-input"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Photo
+                  </Button>
                 </div>
               </div>
             )}
