@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -87,6 +87,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     }
   };
 
+  console.log("formValues", isEmailVerified, isMobileVerified);
   const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
     // Check if all fields are filled
     if (!data.name || !data.location || !data.email || !data.mobile) {

@@ -37,6 +37,7 @@ export function AadharVerificationForm({
   const [loading, setLoading] = useState<boolean>(false);
 
   // Initialize form
+  console.log("formSchema", addharNumber);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

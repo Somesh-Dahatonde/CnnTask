@@ -31,17 +31,17 @@ export function RegistrationModal({ children }: { children: React.ReactNode }) {
 
   console.log(formData, "formData");
 
-  const handleClose = () => {
-    setOpen(false);
-    // Reset after animation completes
-    setTimeout(() => {
-      setStep("register");
-      setFormData({});
-    }, 300);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  //   // Reset after animation completes
+  //   setTimeout(() => {
+  //     setStep("register");
+  //     setFormData({});
+  //   }, 300);
+  // };
 
   function handleVerificationSuccess(data: any): void {
-    throw new Error("Function not implemented.");
+    throw new Error("Function not implemented.", data);
   }
 
   return (
