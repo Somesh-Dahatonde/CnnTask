@@ -44,7 +44,7 @@ export function Header() {
     },
     {
       name: "Contact",
-      route: "#Contact",
+      route: "/contact",
     },
   ];
 

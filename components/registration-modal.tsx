@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { RegistrationForm } from "@/components/registration-form";
 import { PaymentForm } from "@/components/payment-form";
-import { AadharVerificationForm } from "@/components/aadhar-verification-form";
+// import { AadharVerificationForm } from "@/components/aadhar-verification-form";
 
 export function RegistrationModal({ children }: { children: React.ReactNode }) {
   const [step, setStep] = useState<
@@ -40,48 +40,45 @@ export function RegistrationModal({ children }: { children: React.ReactNode }) {
   //   }, 300);
   // };
 
-  function handleVerificationSuccess(data: any): void {
-    throw new Error("Function not implemented.", data);
-  }
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[650px]">
-        <DialogHeader>
-          <DialogTitle>
-            {step === "register"
-              ? "Register for Demo Batch"
-              : "Complete Payment"}
-          </DialogTitle>
-          <DialogDescription>
-            {step === "register"
-              ? "Fill in your details to register for our demo batch."
-              : "Complete the payment process to secure your seat."}
-          </DialogDescription>
-          <hr />
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle>
+              {step === "register"
+                ? "Register for Demo Batch"
+                : "Complete Payment"}
+            </DialogTitle>
+            <DialogDescription>
+              {step === "register"
+                ? "Fill in your details to register for our demo batch."
+                : "Complete the payment process to secure your seat."}
+            </DialogDescription>
+            <hr />
+          </DialogHeader>
 
-        {step === "register" && (
-          <RegistrationForm onSubmit={handleFormSubmit} />
-        )}
-        {step === "payment" && (
-          <PaymentForm
-            amount={100}
-            studentId={formData.user.id}
-            phoneNumber={formData.user.mobile}
-            onCancel={() => setStep("register")}
-          />
-        )}
+          {step === "register" && (
+            <RegistrationForm onSubmit={handleFormSubmit} />
+          )}
+          {step === "payment" && (
+            <PaymentForm
+              amount={100}
+              studentId={formData.user.id}
+              phoneNumber={formData.user.mobile}
+              onCancel={() => setStep("register")}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
-        {step === "addharVerification" && (
-          <AadharVerificationForm
-            addharNumber={formData.user.addharNumber}
-            onSuccess={handleVerificationSuccess}
-            onCancel={() => setStep("payment")}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+      {/* {step === "addharVerification" && (
+        <AadharVerificationForm
+          addharNumber={formData.user.addharNumber}
+          onCancel={() => setStep("payment")}
+        />
+      )} */}
+    </>
   );
 }

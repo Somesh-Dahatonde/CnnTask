@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      {
+        protocol: "https",
+        hostname: "ccn-demo.s3.ap-south-1.amazonaws.com",
+      },
     ],
   },
 };

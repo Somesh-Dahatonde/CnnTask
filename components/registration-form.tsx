@@ -285,7 +285,7 @@ export function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                   <input
                     type="file"
                     accept="image/*"
-                    capture="user"
+                    capture="environment"
                     id="camera-input"
                     ref={cameraInputRef}
                     className="hidden"

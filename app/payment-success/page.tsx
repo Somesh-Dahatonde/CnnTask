@@ -1,14 +1,20 @@
 "use client";
 import { CheckCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
 
-export default function PaymentSuccess() {
+function PaymentSuccessContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const studentId = searchParams.get("studentId");
+  const transactionId = searchParams.get("transactionId");
 
   useEffect(() => {
     setTimeout(() => {
-      router.push("/verifyAddhar");
+      router.push(
+        `/verifyAddhar?studentId=${studentId}&transactionId=${transactionId}`
+      );
     }, 5000);
   }, []);
 
@@ -18,5 +24,13 @@ export default function PaymentSuccess() {
       <h1 className="text-2xl font-bold">Payment Successful!</h1>
       <p>Your transaction has been completed successfully.</p>
     </div>
+  );
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
